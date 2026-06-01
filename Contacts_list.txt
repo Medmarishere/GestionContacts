@@ -1,0 +1,21 @@
+Nom,Téléphone,Email
+Jean Dupont,+33612345678,jean.dupont@email.com
+Marie Martin,0698765432,marie.martin@gmail.com
+Thomas Bernard,+33755443322,t.bernard@yahoo.fr
+Sophie Petit,0711223344,sophie.petit@outlook.com
+Lucas Robert,+33688990011,lucas.robert@gmail.com
+Emma Richard,0622446688,emma.richard@live.fr
+Nicolas Dubois,+33777889900,n.dubois@outlook.fr
+Chloé Moreau,0633557799,chloe.moreau@icloud.com
+Maxime Laurent,+33644881234,m.laurent@proton.me
+Julie Simon,0766554433,julie.simon@hotmail.fr
+Pierre Michel,+33611335577,pierre.michel@gmail.com
+Léa Garcia,0655667788,lea.garcia@outlook.fr
+Antoine Lefebvre,+33712983476,a.lefebvre@yahoo.com
+Sarah Roux,0788442211,sarah.roux@gmail.com
+David Mercier,+33699887766,david.m@bureau.fr
+Camille Bertrand,0614253647,camille.b@gmail.com
+Alexandre Fournier,+33741526374,alex.fournier@orange.fr
+Manon Girard,0796857463,manon.girard@sfr.fr
+Guillaume Bonnet,+33632649512,g.bonnet@gmail.com
+Charlotte Morel,0671829304,charlotte.m@outlook.com

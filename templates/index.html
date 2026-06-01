@@ -1,0 +1,366 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <title>Mon Carnet d'Adresses</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn { padding: 5px 10px; text-decoration: none; background: #007bff; color: white; border-radius: 3px; }
+        .btn-danger { background: #dc3545; }
+        .btn-success { background: #28a745; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>Bienvenue, {{ user }} !</h2>
+            <a href="/logout" class="btn btn-danger">Déconnexion</a>
+        </div>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <p style="color: {% if category == 'error' %}red{% else %}green{% endif %};">{{ message }}</p>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <fieldset>
+            <legend>Nouveau Contact</legend>
+            <form method="POST" action="/ajouter">
+                <input type="text" name="nom" placeholder="Nom" required>
+                <input type="text" name="tel" placeholder="Téléphone" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <button type="submit" class="btn">Ajouter</button>
+            </form>
+        </fieldset>
+
+        <div style="margin-top: 15px;">
+            <a href="/exporter" class="btn btn-success">Exporter en CSV</a>
+        </div>
+
+        <table>
+            <tr>
+                <th>Nom</th>
+                <th>Téléphone</th>
+                <th>Email</th>
+                <th>Action</th>
+            </tr>
+            {% for contact in contacts %}
+            <tr>
+                <td>{{ contact.nom }}</td>
+                <td>{{ contact.tel }}</td>
+                <td>{{ contact.email }}</td>
+                <td>
+                    <a href="/supprimer/{{ contact.nom }}" class="btn btn-danger" onclick="return confirm('Sûr de vouloir supprimer ?')">Supprimer</a>
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center;">Aucun contact dans le carnet.</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html> -->
+
+
+<!-- <!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Carnet d'Adresses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-custom { background-color: #2c3e50; }
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .table-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-custom navbar-dark shadow-sm mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">📖 ContactApp Pro</a>
+            <div class="d-flex align-items-center">
+                <span class="text-light me-3 small">👤 Connecté : <strong>{{ user }}</strong></span>
+                <a href="/logout" class="btn btn-sm btn-outline-light fw-semibold">Déconnexion</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 900px;">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{% if category == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                        {% if category == 'error' %}❌{% else %}✅{% endif %} {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card card-custom p-4 mb-4 bg-white">
+            <h5 class="fw-bold mb-3 text-secondary">➕ Ajouter un nouveau contact</h5>
+            <form method="POST" action="/ajouter" class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" name="nom" class="form-control" placeholder="Nom complet" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="tel" class="form-control" placeholder="Téléphone" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="email" name="email" class="form-control" placeholder="Adresse Email" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Ajouter</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row align-items-center mb-3 g-3">
+            <div class="col-md-4 col-12">
+                <h4 class="fw-bold text-dark mb-0">📋 Liste des contacts</h4>
+            </div>
+            <div class="col-md-5 col-12">
+                <form method="POST" action="/importer" enctype="multipart/form-data" class="d-flex align-items-center bg-white p-1 rounded border shadow-sm">
+                    <input type="file" name="file" accept=".csv" class="form-control form-control-sm me-2 border-0" required>
+                    <button type="submit" class="btn btn-sm btn-primary fw-semibold px-3">🚀 Importer</button>
+                </form>
+            </div>
+            <div class="col-md-3 col-12 text-md-end">
+                <a href="/exporter" class="btn btn-success fw-semibold shadow-sm w-100">📥 Exporter CSV</a>
+            </div>
+        </div>
+
+        <div class="table-container mb-5">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="text-secondary py-3">Nom</th>
+                            <th scope="col" class="text-secondary py-3">Téléphone</th>
+                            <th scope="col" class="text-secondary py-3">Email</th>
+                            <th scope="col" class="text-secondary py-3 text-center" style="width: 100px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contacts %}
+                        <tr>
+                            <td class="fw-bold text-dark">{{ contact.nom }}</td>
+                            <td class="text-muted">{{ contact.tel }}</td>
+                            <td class="text-muted">{{ contact.email }}</td>
+                            <td class="text-center">
+                                <a href="/supprimer/{{ contact.nom }}" class="btn btn-sm btn-outline-danger px-3 rounded-pill" onclick="return confirm('Voulez-vous vraiment supprimer {{ contact.nom }} ?')">
+                                    Supprimer
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                🍃 Aucun contact trouvé dans votre carnet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Carnet d'Adresses</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-custom { background-color: #2c3e50; }
+        .card-custom { border: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .table-container { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-custom navbar-dark shadow-sm mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">📖 ContactApp Pro</a>
+            <div class="d-flex align-items-center">
+                <span class="text-light me-3 small">
+                    👤 Connecté : <strong>{{ session.user }}</strong> 
+                    {% if session.role == 'guest' %} (Mode Lecture Seule) {% endif %}
+                </span>
+                <a href="/logout" class="btn btn-sm btn-outline-light fw-semibold">Déconnexion</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 900px;">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{% if category == 'error' %}danger{% else %}success{% endif %} alert-dismissible fade show" role="alert">
+                        {% if category == 'error' %}❌{% else %}✅{% endif %} {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if session.role == 'admin' %}
+            <div class="card card-custom p-4 mb-4 bg-white">
+                <h5 class="fw-bold mb-3 text-secondary">➕ Ajouter un nouveau contact</h5>
+                <form method="POST" action="/ajouter" class="row g-3">
+                    <div class="col-md-4">
+                        <input type="text" name="nom" class="form-control" placeholder="Nom complet" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="tel" class="form-control" placeholder="Téléphone" required>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="email" name="email" class="form-control" placeholder="Adresse Email" required>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100 fw-bold">Ajouter</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="row align-items-center mb-3 g-3">
+                <div class="col-md-4 col-12">
+                    <h4 class="fw-bold text-dark mb-0">📋 Liste des contacts</h4>
+                </div>
+                <div class="col-md-5 col-12">
+                    <form method="POST" action="/importer" enctype="multipart/form-data" class="d-flex align-items-center bg-white p-1 rounded border shadow-sm">
+                        <input type="file" name="file" accept=".csv" class="form-control form-control-sm me-2 border-0" required>
+                        <button type="submit" class="btn btn-sm btn-primary fw-semibold px-3">🚀 Importer</button>
+                    </form>
+                </div>
+                <div class="col-md-3 col-12 text-md-end">
+                    <a href="/exporter" class="btn btn-success fw-semibold shadow-sm w-100">📥 Exporter CSV</a>
+                </div>
+            </div>
+        {% else %}
+            <div class="mb-3">
+                <h4 class="fw-bold text-dark mb-0">📋 Liste des contacts (Lecture Seule)</h4>
+            </div>
+        {% endif %}
+
+        <div class="table-container mb-5">
+            <!-- <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="text-secondary py-3">Nom</th>
+                            <th scope="col" class="text-secondary py-3">Téléphone</th>
+                            <th scope="col" class="text-secondary py-3">Email</th>
+                            
+                            {% if session.role == 'admin' %}
+                                <th scope="col" class="text-secondary py-3 text-center" style="width: 100px;">Action</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contacts %}
+                        <tr>
+                            <td class="fw-bold text-dark">{{ contact.nom }}</td>
+                            <td class="text-muted">{{ contact.tel }}</td>
+                            <td class="text-muted">{{ contact.email }}</td>
+                            
+                            {% if session.role == 'admin' %}
+                            <td class="text-center">
+                                <a href="/supprimer/{{ contact.nom }}" class="btn btn-sm btn-outline-danger px-3 rounded-pill" onclick="return confirm('Supprimer {{ contact.nom }} ?')">
+                                    Supprimer
+                                </a>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">🍃 Aucun contact trouvé.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div> -->
+            <div class="table-container mb-5">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th scope="col" class="text-secondary py-3">Nom</th>
+                            <th scope="col" class="text-secondary py-3">Téléphone</th>
+                            <th scope="col" class="text-secondary py-3">Email</th>
+                            
+                            {% if session.role == 'admin' %}
+                                <th scope="col" class="text-secondary py-3 text-center">Communications & Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for contact in contacts %}
+                        <tr>
+                            <td class="fw-bold text-dark">{{ contact.nom }}</td>
+                            <td class="text-muted">{{ contact.tel }}</td>
+                            <td class="text-muted">{{ contact.email }}</td>
+                            
+                            {% if session.role == 'admin' %}
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a href="https://wa.me/{{ contact.tel | replace(' ', '') | replace('+', '') }}?text=Bonjour%20{{ contact.nom | urlencode }},%20nous%20vous%20contactons%20pour%20confirmer%20votre%20rendez-vous%20médical." 
+                                       target="_blank" 
+                                       class="btn btn-sm btn-outline-success rounded-pill px-3" 
+                                       title="Envoyer un WhatsApp">
+                                        💬 WhatsApp
+                                    </a>
+
+                                    <a href="/envoyer_email/{{ contact.nom }}/{{ contact.email }}" 
+                                       class="btn btn-sm btn-outline-info rounded-pill px-3" 
+                                       title="Envoyer un Email de confirmation"
+                                       onclick="return confirm('Envoyer un email de confirmation de RDV à {{ contact.nom }} ?')">
+                                        📧 Email
+                                    </a>
+
+                                    <a href="/supprimer/{{ contact.nom }}" 
+                                       class="btn btn-sm btn-outline-danger rounded-pill px-3" 
+                                       onclick="return confirm('Supprimer {{ contact.nom }} ?')">
+                                        🗑️
+                                    </a>
+                                </div>
+                            </td>
+                            {% endif %}
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">🍃 Aucun contact trouvé.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        </div>
+
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
