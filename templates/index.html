@@ -264,7 +264,21 @@
                 <h4 class="fw-bold text-dark mb-0">📋 Liste des contacts (Lecture Seule)</h4>
             </div>
         {% endif %}
-
+<div class="row mb-4 mt-3">
+            <div class="col-12">
+                <form method="GET" action="/index">
+                    <div class="input-group shadow-sm">
+                        <input type="text" name="q" class="form-control border-0 p-3" 
+                               placeholder="🔍 Rechercher un contact par nom ou numéro..." 
+                               value="{{ recherche }}">
+                        <button class="btn btn-primary px-4 fw-bold" type="submit">Chercher</button>
+                        {% if recherche %}
+                            <a href="/index" class="btn btn-outline-secondary px-4 d-flex align-items-center">Effacer</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="table-container mb-5">
             <!-- <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -296,7 +310,7 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-4">🍃 Aucun contact trouvé.</td>
+                            <td colspan="4" class="text-center text-muted py-4"> Aucun contact trouvé.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -351,7 +365,7 @@
                         </tr>
                         {% else %}
                         <tr>
-                            <td colspan="4" class="text-center text-muted py-4">🍃 Aucun contact trouvé.</td>
+                            <td colspan="4" class="text-center text-muted py-4"> Aucun contact trouvé.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
