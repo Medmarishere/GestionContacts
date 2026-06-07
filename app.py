@@ -119,7 +119,9 @@ def ajouter():
         
     return redirect(url_for('index'))
 
-@app.route('/importer', methods=['POST'])
+
+# OLD Version de l'importation CSV (avant US 1.5)
+""" @app.route('/importer', methods=['POST'])
 def importer():
     if session.get('role') != 'admin':
         flash("Action non autorisée.", "error")
@@ -153,6 +155,56 @@ def importer():
     else:
         flash("Fichier CSV requis.", "error")
         
+    return redirect(url_for('index')) """
+
+# New version de l'importation CSV (US 1.5) avec validation et retour détaillé
+# --- IMPORTER CSV (SÉCURISÉ AVEC VALIDATION) ---
+@app.route('/importer', methods=['POST'])
+def importer():
+    if 'user' not in session: return redirect(url_for('login'))
+    
+    if session.get('role') != 'admin':
+        flash("Action non autorisée. Les invités ne peuvent pas importer.", "error")
+        return redirect(url_for('index'))
+        
+    if 'file' not in request.files: return redirect(url_for('index'))
+    file = request.files['file']
+    
+    if file and file.filename.endswith('.csv'):
+        try:
+            stream = io.StringIO(file.stream.read().decode("UTF-8"), newline=None)
+            lecteur_csv = csv.reader(stream)
+            next(lecteur_csv, None) # Ignorer l'en-tête
+            
+            conn = get_db_connection()
+            ajouts_reussis, erreurs = 0, 0
+            
+            for ligne in lecteur_csv:
+                if len(ligne) < 3: continue
+                nom, tel, email = ligne[0].strip(), ligne[1].strip(), ligne[2].strip()
+                
+                # 🛡️ LE VIGILE EST MAINTENANT ICI AUSSI !
+                # On vérifie si les données du CSV respectent les bonnes règles
+                nom_valide = re.match(r"^[A-Za-zÀ-ÿ\s\-]{2,}$", nom)
+                tel_valide = re.match(r"^(?:\+|0)[0-9][0-9\s\-]{6,14}$", tel)
+                email_valide = re.match(r"^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}$", email)
+                
+                # Si TOUT est valide, on l'ajoute
+                if nom_valide and tel_valide and email_valide:
+                    try:
+                        conn.execute("INSERT INTO contacts (nom, tel, email) VALUES (?, ?, ?)", (nom, tel, email))
+                        ajouts_reussis += 1
+                    except sqlite3.IntegrityError:
+                        erreurs += 1 # Erreur : Le nom ou l'email existe déjà
+                else:
+                    erreurs += 1 # Erreur : Le format du CSV est invalide (ex: numéro sans 0)
+                    
+            conn.commit()
+            conn.close()
+            flash(f"Importation terminée : {ajouts_reussis} ajout(s) réussi(s) et {erreurs} ignoré(s) (doublons ou format invalide).", "success")
+        except Exception as e:
+            flash(f"Erreur de lecture : {e}", "error")
+            
     return redirect(url_for('index'))
 
 @app.route('/supprimer/<nom>')
